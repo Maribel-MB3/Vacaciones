@@ -1,1 +1,452 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Team Time Off</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tabler-icons/2.44.0/iconfont/tabler-icons.min.css">
+<style>
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: 'JetBrains Mono', 'SF Mono', ui-monospace, monospace;
+    background: #0d1117;
+    color: #e6edf3;
+    padding: 32px 40px 64px;
+  }
+  .body-sans { font-family: 'Inter', -apple-system, sans-serif; }
+  h1, h2, h3 { font-weight: 500; margin: 0; }
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 28px;
+    flex-wrap: wrap;
+    gap: 16px;
+  }
+  .title-block h1 {
+    font-size: 20px;
+    letter-spacing: -0.2px;
+  }
+  .title-block p {
+    font-family: 'Inter', sans-serif;
+    color: #8b949e;
+    font-size: 13px;
+    margin: 4px 0 0;
+  }
+  .month-nav {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+  }
+  .month-nav button {
+    background: #161b22;
+    border: 1px solid #30363d;
+    color: #e6edf3;
+    width: 28px; height: 28px;
+    border-radius: 6px;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .month-nav button:hover { border-color: #8b949e; }
+  .month-label { min-width: 130px; text-align: center; font-weight: 500; }
 
+  .layout {
+    display: grid;
+    grid-template-columns: 190px 1fr;
+    gap: 0;
+    border: 1px solid #30363d;
+    border-radius: 10px;
+    overflow: hidden;
+    background: #161b22;
+  }
+
+  /* --- coverage strip (signature element) --- */
+  .coverage-row {
+    grid-column: 1 / -1;
+    display: grid;
+    grid-template-columns: 190px 1fr;
+    border-bottom: 1px solid #30363d;
+    background: #10151c;
+  }
+  .coverage-label {
+    padding: 10px 14px;
+    font-family: 'Inter', sans-serif;
+    font-size: 11px;
+    color: #8b949e;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    display: flex;
+    align-items: center;
+  }
+  .coverage-cells {
+    display: grid;
+    padding: 8px 8px;
+    gap: 3px;
+  }
+  .cov-cell {
+    height: 20px;
+    border-radius: 3px;
+    background: #1c2229;
+  }
+
+  /* --- calendar grid --- */
+  .cal-header {
+    display: grid;
+    grid-template-columns: 190px 1fr;
+    border-bottom: 1px solid #30363d;
+  }
+  .cal-header-empty {
+    padding: 8px 14px;
+    font-family: 'Inter', sans-serif;
+    font-size: 11px;
+    color: #8b949e;
+  }
+  .day-numbers {
+    display: grid;
+    padding: 0 8px;
+  }
+  .day-num {
+    font-family: 'Inter', sans-serif;
+    font-size: 10px;
+    color: #6e7681;
+    text-align: center;
+    padding: 8px 0 6px;
+  }
+  .day-num.weekend { color: #484f58; }
+  .day-num.today { color: #39d3bb; font-weight: 600; }
+
+  .person-row {
+    display: grid;
+    grid-template-columns: 190px 1fr;
+    border-bottom: 1px solid #21262d;
+  }
+  .person-row:last-child { border-bottom: none; }
+  .person-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 14px;
+    font-family: 'Inter', sans-serif;
+  }
+  .avatar {
+    width: 26px; height: 26px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 10px;
+    font-weight: 600;
+    color: #0d1117;
+    flex-shrink: 0;
+  }
+  .person-info .name { font-size: 13px; }
+  .person-info .days-used { font-size: 11px; color: #6e7681; }
+
+  .bars-track {
+    position: relative;
+    padding: 10px 8px;
+    display: grid;
+  }
+  .weekend-col {
+    position: absolute;
+    top: 0; bottom: 0;
+    background: rgba(255,255,255,0.02);
+  }
+  .absence-bar {
+    position: absolute;
+    height: 20px;
+    border-radius: 4px;
+    top: 10px;
+    display: flex;
+    align-items: center;
+    padding: 0 8px;
+    font-family: 'Inter', sans-serif;
+    font-size: 10px;
+    font-weight: 500;
+    white-space: nowrap;
+    overflow: hidden;
+    cursor: pointer;
+  }
+
+  .panel {
+    margin-top: 20px;
+    background: #161b22;
+    border: 1px solid #30363d;
+    border-radius: 10px;
+    padding: 16px 18px;
+    font-family: 'Inter', sans-serif;
+  }
+  .panel h3 { font-size: 13px; margin-bottom: 12px; color: #e6edf3; }
+  .form-row {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+  select, input, button.primary {
+    background: #0d1117;
+    border: 1px solid #30363d;
+    color: #e6edf3;
+    border-radius: 6px;
+    padding: 7px 10px;
+    font-size: 13px;
+    font-family: 'Inter', sans-serif;
+  }
+  button.primary {
+    background: #238636;
+    border-color: #2ea043;
+    cursor: pointer;
+    font-weight: 500;
+  }
+  button.primary:hover { background: #2ea043; }
+
+  .legend {
+    display: flex;
+    gap: 16px;
+    margin-top: 14px;
+    font-family: 'Inter', sans-serif;
+    font-size: 12px;
+    color: #8b949e;
+    flex-wrap: wrap;
+  }
+  .legend-item { display: flex; align-items: center; gap: 6px; }
+  .legend-dot { width: 9px; height: 9px; border-radius: 2px; }
+
+  .note {
+    font-family: 'Inter', sans-serif;
+    font-size: 11.5px;
+    color: #6e7681;
+    margin-top: 14px;
+    line-height: 1.6;
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="title-block">
+    <h1><i class="ti ti-beach" style="font-size:18px;vertical-align:-3px;margin-right:6px;color:#39d3bb" aria-hidden="true"></i>Team time off</h1>
+    <p>Vista tipo roadmap — datos de ejemplo, prototipo local</p>
+  </div>
+  <div class="month-nav">
+    <button id="prevMonth" aria-label="Mes anterior"><i class="ti ti-chevron-left" aria-hidden="true"></i></button>
+    <span class="month-label" id="monthLabel"></span>
+    <button id="nextMonth" aria-label="Mes siguiente"><i class="ti ti-chevron-right" aria-hidden="true"></i></button>
+  </div>
+</div>
+
+<div class="layout" id="layout"></div>
+
+<div class="panel">
+  <h3>Añadir ausencia</h3>
+  <div class="form-row">
+    <select id="personSelect"></select>
+    <select id="typeSelect">
+      <option value="vacation">Vacaciones</option>
+      <option value="remote">Teletrabajo</option>
+      <option value="sick">Baja</option>
+    </select>
+    <input type="date" id="startDate">
+    <span style="color:#6e7681;font-size:12px">a</span>
+    <input type="date" id="endDate">
+    <button class="primary" id="addBtn"><i class="ti ti-plus" aria-hidden="true" style="vertical-align:-2px"></i> Añadir</button>
+  </div>
+  <div class="legend">
+    <div class="legend-item"><span class="legend-dot" style="background:#39d3bb"></span>Vacaciones</div>
+    <div class="legend-item"><span class="legend-dot" style="background:#d4a72c"></span>Teletrabajo</div>
+    <div class="legend-item"><span class="legend-dot" style="background:#d85a30"></span>Baja</div>
+    <div class="legend-item"><span class="legend-dot" style="background:#1c2229"></span>0 fuera</div>
+    <div class="legend-item"><span class="legend-dot" style="background:#5dcaa5"></span>1-2 fuera</div>
+    <div class="legend-item"><span class="legend-dot" style="background:#0f6e56"></span>3+ fuera</div>
+  </div>
+  <p class="note">La franja superior funciona como el mapa de contribuciones de GitHub, pero al revés: cuanto más oscura la celda, más gente del equipo está fuera ese día. Útil para detectar de un vistazo las semanas con poca cobertura antes de aprobar una nueva solicitud.</p>
+</div>
+
+<script>
+const PEOPLE = [
+  { id: 'p1', name: 'Laura Ibáñez', color: '#7f77dd' },
+  { id: 'p2', name: 'Marcos Ruiz', color: '#1d9e75' },
+  { id: 'p3', name: 'Nadia Ortiz', color: '#d85a30' },
+  { id: 'p4', name: 'Iñaki Torres', color: '#d4537e' },
+  { id: 'p5', name: 'Elena Vidal', color: '#378add' },
+];
+
+const TYPE_COLORS = {
+  vacation: '#39d3bb',
+  remote: '#d4a72c',
+  sick: '#d85a30'
+};
+const TYPE_LABELS = { vacation: 'Vacaciones', remote: 'Teletrabajo', sick: 'Baja' };
+
+let absences = [
+  { id: 'a1', personId: 'p1', type: 'vacation', start: '2026-08-10', end: '2026-08-21' },
+  { id: 'a2', personId: 'p2', type: 'vacation', start: '2026-08-03', end: '2026-08-07' },
+  { id: 'a3', personId: 'p3', type: 'remote', start: '2026-08-17', end: '2026-08-19' },
+  { id: 'a4', personId: 'p4', type: 'vacation', start: '2026-08-24', end: '2026-08-31' },
+  { id: 'a5', personId: 'p5', type: 'sick', start: '2026-08-05', end: '2026-08-06' },
+  { id: 'a6', personId: 'p2', type: 'vacation', start: '2026-08-20', end: '2026-08-28' },
+];
+
+let current = new Date(2026, 7, 1);
+const todayStr = new Date().toISOString().slice(0,10);
+
+const MONTH_NAMES = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+
+function daysInMonth(d) { return new Date(d.getFullYear(), d.getMonth()+1, 0).getDate(); }
+function fmt(d) { return d.toISOString().slice(0,10); }
+
+async function loadData() {
+  try {
+    const res = await window.storage.get('vacation-absences', true);
+    if (res && res.value) absences = JSON.parse(res.value);
+  } catch(e) { /* no guardado aun, usamos datos de ejemplo */ }
+}
+async function saveData() {
+  try { await window.storage.set('vacation-absences', JSON.stringify(absences), true); }
+  catch(e) { console.error('No se pudo guardar', e); }
+}
+
+function render() {
+  const year = current.getFullYear();
+  const month = current.getMonth();
+  const numDays = daysInMonth(current);
+  document.getElementById('monthLabel').textContent = MONTH_NAMES[month] + ' ' + year;
+
+  const layout = document.getElementById('layout');
+  layout.innerHTML = '';
+  layout.style.setProperty('--days', numDays);
+
+  // coverage row
+  const covRow = document.createElement('div');
+  covRow.className = 'coverage-row';
+  const covLabel = document.createElement('div');
+  covLabel.className = 'coverage-label';
+  covLabel.textContent = 'Cobertura';
+  const covCells = document.createElement('div');
+  covCells.className = 'coverage-cells';
+  covCells.style.gridTemplateColumns = `repeat(${numDays}, 1fr)`;
+  for (let day = 1; day <= numDays; day++) {
+    const dateStr = fmt(new Date(year, month, day));
+    const count = absences.filter(a => dateStr >= a.start && dateStr <= a.end).length;
+    const cell = document.createElement('div');
+    cell.className = 'cov-cell';
+    cell.title = `${count} fuera el ${day}/${month+1}`;
+    if (count === 1 || count === 2) cell.style.background = '#5dcaa5';
+    else if (count >= 3) cell.style.background = '#0f6e56';
+    covCells.appendChild(cell);
+  }
+  covRow.appendChild(covLabel);
+  covRow.appendChild(covCells);
+  layout.appendChild(covRow);
+
+  // header with day numbers
+  const header = document.createElement('div');
+  header.className = 'cal-header';
+  const headerEmpty = document.createElement('div');
+  headerEmpty.className = 'cal-header-empty';
+  headerEmpty.textContent = 'Equipo';
+  const dayNums = document.createElement('div');
+  dayNums.className = 'day-numbers';
+  dayNums.style.gridTemplateColumns = `repeat(${numDays}, 1fr)`;
+  for (let day = 1; day <= numDays; day++) {
+    const dateStr = fmt(new Date(year, month, day));
+    const dow = new Date(year, month, day).getDay();
+    const el = document.createElement('div');
+    el.className = 'day-num' + ((dow === 0 || dow === 6) ? ' weekend' : '') + (dateStr === todayStr ? ' today' : '');
+    el.textContent = day;
+    dayNums.appendChild(el);
+  }
+  header.appendChild(headerEmpty);
+  header.appendChild(dayNums);
+  layout.appendChild(header);
+
+  // person rows
+  PEOPLE.forEach(person => {
+    const row = document.createElement('div');
+    row.className = 'person-row';
+
+    const info = document.createElement('div');
+    info.className = 'person-info';
+    const initials = person.name.split(' ').map(w => w[0]).join('').slice(0,2).toUpperCase();
+    const totalDays = absences.filter(a => a.personId === person.id && a.type === 'vacation')
+      .reduce((sum, a) => sum + (new Date(a.end) - new Date(a.start))/86400000 + 1, 0);
+    info.innerHTML = `
+      <div class="avatar" style="background:${person.color}">${initials}</div>
+      <div>
+        <div class="name">${person.name}</div>
+        <div class="days-used">${totalDays} días este año</div>
+      </div>
+    `;
+
+    const track = document.createElement('div');
+    track.className = 'bars-track';
+    track.style.gridTemplateColumns = `repeat(${numDays}, 1fr)`;
+
+    const personAbsences = absences.filter(a => a.personId === person.id);
+    personAbsences.forEach(a => {
+      const startD = new Date(a.start + 'T00:00:00');
+      const endD = new Date(a.end + 'T00:00:00');
+      const monthStart = new Date(year, month, 1);
+      const monthEnd = new Date(year, month, numDays);
+      if (endD < monthStart || startD > monthEnd) return;
+      const clampedStart = startD < monthStart ? monthStart : startD;
+      const clampedEnd = endD > monthEnd ? monthEnd : endD;
+      const startDay = clampedStart.getDate();
+      const spanDays = (clampedEnd - clampedStart)/86400000 + 1;
+      const leftPct = ((startDay - 1) / numDays) * 100;
+      const widthPct = (spanDays / numDays) * 100;
+
+      const bar = document.createElement('div');
+      bar.className = 'absence-bar';
+      bar.style.left = leftPct + '%';
+      bar.style.width = `calc(${widthPct}% - 4px)`;
+      bar.style.background = TYPE_COLORS[a.type] + '33';
+      bar.style.color = TYPE_COLORS[a.type];
+      bar.style.border = `1px solid ${TYPE_COLORS[a.type]}66`;
+      bar.textContent = TYPE_LABELS[a.type];
+      bar.title = `${TYPE_LABELS[a.type]}: ${a.start} → ${a.end}`;
+      bar.onclick = async () => {
+        if (confirm(`¿Eliminar "${TYPE_LABELS[a.type]}" de ${person.name} (${a.start} a ${a.end})?`)) {
+          absences = absences.filter(x => x.id !== a.id);
+          await saveData();
+          render();
+        }
+      };
+      track.appendChild(bar);
+    });
+
+    row.appendChild(info);
+    row.appendChild(track);
+    layout.appendChild(row);
+  });
+}
+
+function populatePersonSelect() {
+  const sel = document.getElementById('personSelect');
+  sel.innerHTML = PEOPLE.map(p => `<option value="${p.id}">${p.name}</option>`).join('');
+}
+
+document.getElementById('prevMonth').onclick = () => { current.setMonth(current.getMonth()-1); render(); };
+document.getElementById('nextMonth').onclick = () => { current.setMonth(current.getMonth()+1); render(); };
+
+document.getElementById('addBtn').onclick = async () => {
+  const personId = document.getElementById('personSelect').value;
+  const type = document.getElementById('typeSelect').value;
+  const start = document.getElementById('startDate').value;
+  const end = document.getElementById('endDate').value;
+  if (!start || !end) { alert('Elige fecha de inicio y fin'); return; }
+  if (end < start) { alert('La fecha de fin no puede ser anterior a la de inicio'); return; }
+  absences.push({ id: 'a' + Date.now(), personId, type, start, end });
+  await saveData();
+  render();
+};
+
+(async () => {
+  populatePersonSelect();
+  await loadData();
+  render();
+})();
+</script>
+</body>
+</html>
