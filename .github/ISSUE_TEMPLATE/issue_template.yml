@@ -1,47 +1,23 @@
-name: Reporte de error
-description: Crear un informe de error
-title: "[BUG]: "
-labels:
-  - bug
-
+name: Solicitud de vacaciones
+description: Solicitar días de vacaciones
+title: "[VACACIONES] "
 body:
-  - type: markdown
+  - type: input
+    id: empleado
     attributes:
-      value: |
-        Gracias por reportar este problema.
+      label: Empleado
+
+  - type: input
+    id: fecha_inicio
+    attributes:
+      label: Fecha inicio
+
+  - type: input
+    id: fecha_fin
+    attributes:
+      label: Fecha fin
 
   - type: textarea
-    id: description
+    id: comentarios
     attributes:
-      label: Descripción
-      description: Explica el error observado.
-      placeholder: Describe el problema...
-    validations:
-      required: true
-
-  - type: textarea
-    id: steps
-    attributes:
-      label: Pasos para reproducir
-      placeholder: |
-        1. Ir a...
-        2. Hacer clic en...
-        3. Ver error
-    validations:
-      required: true
-
-  - type: textarea
-    id: expected
-    attributes:
-      label: Comportamiento esperado
-    validations:
-      required: true
-
-  - type: dropdown
-    id: environment
-    attributes:
-      label: Entorno
-      options:
-        - Desarrollo
-        - Pruebas
-        - Producción
+      label: Comentarios
