@@ -1,1 +1,279 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vacaciones del equipo</title>
 
+<style>
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: #0d1117;
+  color: #e6edf3;
+  font-family: Arial, sans-serif;
+  padding: 30px;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+h1 {
+  margin: 0;
+}
+
+button {
+  background: #21262d;
+  border: 1px solid #30363d;
+  color: white;
+  padding: 6px 10px;
+  cursor: pointer;
+  border-radius: 6px;
+}
+
+button:hover {
+  background: #30363d;
+}
+
+#monthLabel {
+  margin: 0 15px;
+  font-weight: bold;
+}
+
+.calendar {
+  border: 1px solid #30363d;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.row {
+  display: grid;
+  grid-template-columns: 200px 1fr;
+  border-bottom: 1px solid #30363d;
+}
+
+.row:last-child {
+  border-bottom: none;
+}
+
+.name {
+  padding: 12px;
+  background: #161b22;
+  font-weight: bold;
+}
+
+.track {
+  position: relative;
+  height: 50px;
+  background: #161b22;
+}
+
+.bar {
+  position: absolute;
+  top: 14px;
+  height: 22px;
+  border-radius: 4px;
+  background: #39d353;
+  color: black;
+  font-size: 12px;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  padding: 0 8px;
+}
+
+.header-days {
+  display: grid;
+  grid-template-columns: 200px 1fr;
+  background: #10151c;
+}
+
+.header-title {
+  padding: 10px;
+  font-weight: bold;
+}
+
+.days {
+  display: grid;
+}
+
+.day {
+  text-align: center;
+  font-size: 11px;
+  padding: 10px 0;
+}
+
+.empty {
+  padding: 25px;
+  text-align: center;
+  color: #8b949e;
+}
+</style>
+</head>
+
+<body>
+
+<div class="header">
+  <h1>🌴 Vacaciones del equipo</h1>
+
+  <div>
+    <button id="prevMonth">&lt;</button>
+    <span id="monthLabel"></span>
+    <button id="nextMonth">&gt;</button>
+  </div>
+</div>
+
+<div id="calendar"></div>
+
+<script>
+
+let vacations = [];
+let current = new Date();
+
+const MONTHS = [
+  "Enero","Febrero","Marzo","Abril",
+  "Mayo","Junio","Julio","Agosto",
+  "Septiembre","Octubre","Noviembre","Diciembre"
+];
+
+async function loadData() {
+
+  const response = await fetch("./vacations.json");
+  vacations = await response.json();
+
+  render();
+}
+
+function daysInMonth(year, month) {
+  return new Date(year, month + 1, 0).getDate();
+}
+
+function render() {
+
+  const year = current.getFullYear();
+  const month = current.getMonth();
+  const numDays = daysInMonth(year, month);
+
+  document.getElementById("monthLabel").textContent =
+    MONTHS[month] + " " + year;
+
+  const calendar = document.getElementById("calendar");
+
+  if (!vacations.length) {
+    calendar.innerHTML =
+      '<div class="empty">No hay vacaciones aprobadas</div>';
+    return;
+  }
+
+  const people = [...new Set(vacations.map(v => v.employee))];
+
+  let html = '';
+
+  html += `
+    <div class="calendar">
+
+      <div class="header-days">
+        <div class="header-title">Empleado</div>
+        <div class="days"
+             style="grid-template-columns:repeat(${numDays},1fr)">
+  `;
+
+  for (let d = 1; d <= numDays; d++) {
+    html += `<div class="day">${d}</div>`;
+  }
+
+  html += `
+        </div>
+      </div>
+  `;
+
+  people.forEach(person => {
+
+    html += `
+      <div class="row">
+        <div class="name">${person}</div>
+        <div class="track">
+    `;
+
+    const personVacations =
+      vacations.filter(v => v.employee === person);
+
+    personVacations.forEach(v => {
+
+      const start = new Date(v.start);
+      const end = new Date(v.end);
+
+      if (
+        start.getMonth() !== month &&
+        end.getMonth() !== month
+      ) {
+        return;
+      }
+
+      const startDay =
+        Math.max(
+          1,
+          start.getMonth() === month
+            ? start.getDate()
+            : 1
+        );
+
+      const endDay =
+        Math.min(
+          numDays,
+          end.getMonth() === month
+            ? end.getDate()
+            : numDays
+        );
+
+      const left =
+        ((startDay - 1) / numDays) * 100;
+
+      const width =
+        ((endDay - startDay + 1) / numDays) * 100;
+
+      html += `
+        <div
+          class="bar"
+          style="
+            left:${left}%;
+            width:${width}%;">
+          Vacaciones
+        </div>
+      `;
+    });
+
+    html += `
+        </div>
+      </div>
+    `;
+  });
+
+  html += `</div>`;
+
+  calendar.innerHTML = html;
+}
+
+document.getElementById("prevMonth").onclick = () => {
+  current.setMonth(current.getMonth() - 1);
+  render();
+};
+
+document.getElementById("nextMonth").onclick = () => {
+  current.setMonth(current.getMonth() + 1);
+  render();
+};
+
+loadData();
+
+</script>
+
+</body>
+</html>
