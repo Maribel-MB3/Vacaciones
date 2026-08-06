@@ -279,14 +279,21 @@ const TYPE_COLORS = {
 };
 const TYPE_LABELS = { vacation: 'Vacaciones', remote: 'Teletrabajo', sick: 'Baja' };
 
-let absences = [
-  { id: 'a1', personId: 'p1', type: 'vacation', start: '2026-08-10', end: '2026-08-21' },
-  { id: 'a2', personId: 'p2', type: 'vacation', start: '2026-08-03', end: '2026-08-07' },
-  { id: 'a3', personId: 'p3', type: 'remote', start: '2026-08-17', end: '2026-08-19' },
-  { id: 'a4', personId: 'p4', type: 'vacation', start: '2026-08-24', end: '2026-08-31' },
-  { id: 'a5', personId: 'p5', type: 'sick', start: '2026-08-05', end: '2026-08-06' },
-  { id: 'a6', personId: 'p2', type: 'vacation', start: '2026-08-20', end: '2026-08-28' },
-];
+let absences = [];
+fetch('./vacations.json')
+  .then(r => r.json())
+  .then(data => {
+
+    absences = data.map((v, i) => ({
+      id: `v${i}`,
+      personId: v.employee,
+      type: 'vacation',
+      start: v.start,
+      end: v.end
+    }));
+
+    render();
+  });
 
 let current = new Date(2026, 7, 1);
 const todayStr = new Date().toISOString().slice(0,10);
