@@ -1,23 +1,33 @@
 name: Solicitud de vacaciones
-description: Solicitar días de vacaciones
+description: Solicitar vacaciones
+
 title: "[VACACIONES] "
+
 body:
   - type: input
     id: empleado
     attributes:
       label: Empleado
+      placeholder: Nombre del empleado
+    validations:
+      required: true
 
-  - type: input
+  - type: datepicker
     id: fecha_inicio
     attributes:
       label: Fecha inicio
+    validations:
+      required: true
 
-  - type: input
+  - type: datepicker
     id: fecha_fin
     attributes:
       label: Fecha fin
+    validations:
+      required: true
 
   - type: textarea
     id: comentarios
     attributes:
       label: Comentarios
+      placeholder: Información adicional
