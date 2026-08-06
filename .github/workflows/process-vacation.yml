@@ -21,37 +21,37 @@ jobs:
         uses: actions/github-script@v7
         with:
           script: |
-            const fs = require('fs');
+                const fs = require('fs');
 
-            const body = context.payload.issue.body;
+                const body = context.payload.issue.body;
 
-            const employee =
-              body.match(/### Empleado\s+([\s\S]*?)\s+### Fecha inicio/)?.[1]?.trim();
-
-            const start =
-              body.match(/### Fecha inicio\s+([\s\S]*?)\s+### Fecha fin/)?.[1]?.trim();
-
-            const end =
-              body.match(/### Fecha fin\s+([\s\S]*?)\s+### Comentarios/)?.[1]?.trim();
-
-            let vacations = [];
-
-            if (fs.existsSync('vacations.json')) {
-              vacations = JSON.parse(
-                fs.readFileSync('vacations.json', 'utf8')
-              );
-            }
-
-            vacations.push({
-              employee,
-              start,
-              end
-            });
-
-            fs.writeFileSync(
-              'vacations.json',
-              JSON.stringify(vacations, null, 2)
-            );
+                  const employee =
+                    body.match(/### Empleado\s+([\s\S]*?)\s+### Fecha inicio/)?.[1]?.trim();
+                  
+                  const start =
+                    body.match(/### Fecha inicio\s+([\s\S]*?)\s+### Fecha fin/)?.[1]?.trim();
+                  
+                  const end =
+                    body.match(/### Fecha fin\s+([\s\S]*?)\s+### Comentarios/)?.[1]?.trim();
+                  
+                  let vacations = [];
+                  
+                  if (fs.existsSync('vacations.json')) {
+                    vacations = JSON.parse(
+                      fs.readFileSync('vacations.json', 'utf8')
+                    );
+                  }
+                  
+                  vacations.push({
+                    employee,
+                    start,
+                    end
+                  });
+                  
+                  fs.writeFileSync(
+                    'vacations.json',
+                    JSON.stringify(vacations, null, 2)
+                  );
 
       - name: Commit changes
         run: |
