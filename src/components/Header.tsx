@@ -166,15 +166,7 @@ export const Header: React.FC<HeaderProps> = ({
             <Sparkles className="w-3.5 h-3.5 text-[#5A5A40]" />
             <span className="hidden sm:inline">IA Informe</span>
           </button>
-
-          <button
-            onClick={onOpenEmployeeModal}
-            className="p-2 hover:bg-[#F0EEE6] text-[#3D3D3D] rounded-xl border border-[#E5E2D9] bg-white transition-colors cursor-pointer"
-            title="Gestionar Equipo"
-          >
-            <Users className="w-4 h-4" />
-          </button>
-
+          
           <button
             onClick={onExportJson}
             className="p-2 hover:bg-[#F0EEE6] text-[#3D3D3D] rounded-xl border border-[#E5E2D9] bg-white transition-colors cursor-pointer"
