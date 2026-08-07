@@ -18,23 +18,7 @@ body:
       placeholder: Nombre y apellidos
     validations:
       required: true
-
-  - type: input
-    id: department
-    attributes:
-      label: Departamento
-      placeholder: Desarrollo
-    validations:
-      required: true
-
-  - type: input
-    id: avatarColor
-    attributes:
-      label: Color avatar
-      placeholder: "#5A5A40"
-    validations:
-      required: true
-
+  
   - type: input
     id: start
     attributes:
