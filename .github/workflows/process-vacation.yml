@@ -25,7 +25,7 @@ jobs:
         with:
           script: |
             const fs = require('fs');
-
+            const vacationId = `vac-${vacations.length + 1}`;
             const body = context.payload.issue.body || '';
             
             const employeeMatch =
