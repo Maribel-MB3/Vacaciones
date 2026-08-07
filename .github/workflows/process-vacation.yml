@@ -19,7 +19,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Process issue and update vacations.json
+      - name: Process issue and update public/vacations.json
         id: process
         uses: actions/github-script@v7
         with:
@@ -44,15 +44,15 @@ jobs:
 
             let vacations = [];
 
-            if (fs.existsSync('vacations.json')) {
-              const raw = fs.readFileSync('vacations.json', 'utf8').trim();
+            if (fs.existsSync('public/vacations.json')) {
+              const raw = fs.readFileSync('public/vacations.json', 'utf8').trim();
               vacations = raw ? JSON.parse(raw) : [];
             }
 
             vacations.push({ employee, start, end });
 
             fs.writeFileSync(
-              'vacations.json',
+              'public/vacations.json',
               JSON.stringify(vacations, null, 2) + '\n'
             );
 
@@ -63,7 +63,7 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
-          git add vacations.json
+          git add public/vacations.json
 
           git diff --staged --quiet || git commit -m "Añadir vacaciones de ${{ steps.process.outputs.employee }}"
           git push
