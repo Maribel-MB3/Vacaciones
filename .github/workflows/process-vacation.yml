@@ -31,9 +31,7 @@ jobs:
             const employeeMatch =
                     body.match(/### Empleado\s+([\s\S]*?)\s+### Departamento/);
             const employee = employeeMatch ? employeeMatch[1].trim() : '';                  
-            const departmentMatch =
-                    body.match(/### Departamento\s+([\s\S]*?)\s+### Color avatar/);
-             const department = departmentMatch ? departmentMatch[1].trim() : '';
+            const department = 'Desarrollo';
             const avatarColor = generateColor(employee);
              const startMatch =
                     body.match(/### Fecha inicio\s+([\s\S]*?)\s+### Fecha fin/);
