@@ -25,7 +25,7 @@ jobs:
         with:
           script: |
             const fs = require('fs');
-            const vacationId = `vac-${vacations.length + 1}`;
+           
             const body = context.payload.issue.body || '';
             
             const employeeMatch =
@@ -63,7 +63,7 @@ jobs:
               const raw = fs.readFileSync('public/vacations.json', 'utf8').trim();
               vacations = raw ? JSON.parse(raw) : [];
             }
-
+            const vacationId = `vac-${vacations.length + 1}`;
             vacations.push({
               id: vacationId,
               employee,
