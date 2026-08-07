@@ -1,7 +1,13 @@
 [
   {
-    "employee": "Empleado 1",
-    "start": "2026-05-12",
-    "end": "2026-05-12"
+    "id": "vac-1",
+    "employee": "Laura García",
+    "department": "Desarrollo",
+    "avatarColor": "#5A5A40",
+    "start": "2025-06-04",
+    "end": "2025-06-08",
+    "type": "vacation",
+    "status": "approved",
+    "notes": "Vacaciones de verano"
   }
 ]
