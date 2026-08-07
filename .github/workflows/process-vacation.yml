@@ -41,7 +41,7 @@ jobs:
             
               return color;
             }
-            ``
+          
             const body = context.payload.issue.body || '';
             
             const employeeMatch =
