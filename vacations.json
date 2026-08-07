@@ -13,5 +13,10 @@
     "employee": "Empleado 3",
     "start": "2026-08-07",
     "end": "2026-15-07"
+  },
+  {
+    "employee": "Empleado 4",
+    "start": "2026-08-15",
+    "end": "2026-08-17"
   }
 ]
