@@ -1,11 +1,18 @@
 name: Solicitud de vacaciones
 description: Solicitar vacaciones
-
 title: "[VACACIONES] "
 
 body:
   - type: input
-    id: empleado
+    id: id
+    attributes:
+      label: Identificador
+      placeholder: vac-1
+    validations:
+      required: true
+
+  - type: input
+    id: employee
     attributes:
       label: Empleado
       placeholder: Nombre y apellidos
@@ -13,25 +20,59 @@ body:
       required: true
 
   - type: input
-    id: fecha_inicio
+    id: department
     attributes:
-      label: Fecha inicio
-      placeholder: YYYY-MM-DD
-      description: Ejemplo 2026-09-01
+      label: Departamento
+      placeholder: Desarrollo
     validations:
       required: true
 
   - type: input
-    id: fecha_fin
+    id: avatarColor
+    attributes:
+      label: Color avatar
+      placeholder: "#5A5A40"
+    validations:
+      required: true
+
+  - type: input
+    id: start
+    attributes:
+      label: Fecha inicio
+      placeholder: YYYY-MM-DD
+    validations:
+      required: true
+
+  - type: input
+    id: end
     attributes:
       label: Fecha fin
       placeholder: YYYY-MM-DD
-      description: Ejemplo 2026-09-30
+    validations:
+      required: true
+
+  - type: dropdown
+    id: type
+    attributes:
+      label: Tipo
+      options:
+        - vacation
+    validations:
+      required: true
+
+  - type: dropdown
+    id: status
+    attributes:
+      label: Estado
+      options:
+        - approved
+        - pending
+        - rejected
     validations:
       required: true
 
   - type: textarea
-    id: comentarios
+    id: notes
     attributes:
       label: Comentarios
-
+      placeholder: Vacaciones de verano
