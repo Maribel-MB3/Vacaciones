@@ -45,16 +45,16 @@ Para construir los archivos estáticos listos para subir a GitHub Pages o cualqu
 npm run build
 ```
 
-### Opciones de despliegue en GitHub:
+### ⚙️ Configuración para GitHub Pages (Solución pantalla en blanco)
 
-1. **Exportar desde la interfaz de AI Studio**:
-   - Haz clic en el menú **Settings / Exportar** en la esquina superior de AI Studio.
-   - Selecciona **Export to GitHub** para subir todo el código automáticamente a un repositorio de tu cuenta de GitHub.
+1. **Rutas relativas activadas (`base: './'`)**:
+   Ya se ha configurado `vite.config.ts` con `base: './'` para que las rutas de los archivos JS/CSS no fallen en subdominios de GitHub Pages (`https://usuario.github.io/nombre-repo/`).
 
-2. **Despliegue con GitHub Actions**:
-   - Sube este repositorio a GitHub.
-   - Ve a **Settings > Pages** en tu repositorio de GitHub.
-   - En **Source**, selecciona **GitHub Actions** o despliega desde la rama `main` sirviendo la carpeta `dist`.
+2. **Despliegue automático con GitHub Actions**:
+   Hemos incluido el archivo de flujo `.github/workflows/deploy.yml`.
+   - En tu repositorio de GitHub, ve a **Settings** > **Pages**.
+   - En **Build and deployment** > **Source**, selecciona **GitHub Actions**.
+   - Cada vez que subas cambios o exportes a la rama `main`, GitHub compilará y publicará la web automáticamente.
 
 ---
 
