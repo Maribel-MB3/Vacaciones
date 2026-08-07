@@ -43,6 +43,10 @@ jobs:
             }
           
             const body = context.payload.issue.body || '';
+
+            console.log('BODY START');
+            console.log(body);
+            console.log('BODY END');
             
             const employeeMatch =
                     body.match(/### Empleado\s+([\s\S]*?)\s+### Departamento/);
