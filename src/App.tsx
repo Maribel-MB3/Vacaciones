@@ -8,24 +8,47 @@ import { AiAnalysisModal } from './components/AiAnalysisModal';
 import { EmployeeManagerModal } from './components/EmployeeManagerModal';
 import { SettingsModal } from './components/SettingsModal';
 
-import { INITIAL_EMPLOYEES, INITIAL_VACATIONS } from './data/initialData';
+import defaultVacationsData from './vacations.json';
 import { Employee, VacationRequest, FilterState, ViewMode } from './types';
 import { getPastelForName } from './utils/dateUtils';
 
+// Helper to derive employee list from vacation entries
+function deriveEmployeesFromVacations(vacList: VacationRequest[]): Employee[] {
+  const map = new Map<string, Employee>();
+  vacList.forEach((v) => {
+    if (v.employee && !map.has(v.employee)) {
+      const pastel = getPastelForName(v.employee);
+      map.set(v.employee, {
+        id: `emp-${v.employee.toLowerCase().replace(/\s+/g, '-')}`,
+        name: v.employee,
+        department: v.department || 'Desarrollo',
+        role: 'Desarrollador',
+        avatarColor: v.avatarColor || pastel.hexBg,
+        annualAllowance: 23,
+      });
+    }
+  });
+  return Array.from(map.values());
+}
+
 export default function App() {
   // Persistence keys
-  const STORAGE_KEY_VACATIONS = 'natural_vacations_data_v2';
-  const STORAGE_KEY_EMPLOYEES = 'natural_employees_data_v2';
+  const STORAGE_KEY_VACATIONS = 'natural_vacations_data_v4';
+  const STORAGE_KEY_EMPLOYEES = 'natural_employees_data_v4';
+
+  // Default initial values from vacations.json
+  const defaultVacations = defaultVacationsData as VacationRequest[];
+  const defaultEmployees = deriveEmployeesFromVacations(defaultVacations);
 
   // State
   const [employees, setEmployees] = useState<Employee[]>(() => {
     const saved = localStorage.getItem(STORAGE_KEY_EMPLOYEES);
-    return saved ? JSON.parse(saved) : INITIAL_EMPLOYEES;
+    return saved ? JSON.parse(saved) : defaultEmployees;
   });
 
   const [vacations, setVacations] = useState<VacationRequest[]>(() => {
     const saved = localStorage.getItem(STORAGE_KEY_VACATIONS);
-    return saved ? JSON.parse(saved) : INITIAL_VACATIONS;
+    return saved ? JSON.parse(saved) : defaultVacations;
   });
 
   // Current View Date & View Mode
@@ -60,59 +83,49 @@ export default function App() {
   }, [vacations]);
 
   // Function to load data from vacations.json
-  const loadVacationsJson = async (showToast = true) => {
+  const loadVacationsData = async (showToast = true) => {
     setIsSyncing(true);
+    let loadedVacations: VacationRequest[] | null = null;
+
     try {
-      const res = await fetch(`./vacations.json?_=${Date.now()}`, { cache: 'no-store' });
-      if (res.ok) {
-        const jsonVacations: VacationRequest[] = await res.json();
-        if (Array.isArray(jsonVacations) && jsonVacations.length > 0) {
-          setVacations(jsonVacations);
-
-          // Ensure employees list includes anyone present in vacations.json
-          setEmployees((prev) => {
-            const updated = [...prev];
-            jsonVacations.forEach((v) => {
-              if (v.employee && !updated.some((e) => e.name === v.employee)) {
-                const pastel = getPastelForName(v.employee);
-                updated.push({
-                  id: `emp-${Date.now()}-${Math.random().toString(36).substr(2, 5)}`,
-                  name: v.employee,
-                  department: v.department || 'Desarrollo',
-                  role: 'Desarrollador',
-                  avatarColor: v.avatarColor || pastel.hexBg,
-                  annualAllowance: 23,
-                });
-              }
-            });
-            return updated;
-          });
-
-          if (showToast) {
-            flashStatus('Datos cargados desde vacations.json');
-          }
+      const resJson = await fetch(`./vacations.json?_=${Date.now()}`, { cache: 'no-store' });
+      if (resJson.ok) {
+        const json = await resJson.json();
+        if (Array.isArray(json) && json.length > 0) {
+          loadedVacations = json;
         }
       }
     } catch (err) {
-      console.warn('No se pudo cargar vacations.json:', err);
-      if (showToast) {
-        flashStatus('Usando datos locales');
-      }
-    } finally {
-      setIsSyncing(false);
+      console.warn('No se pudo cargar ./vacations.json:', err);
     }
+
+    // Fallback to imported vacations.json
+    if (!loadedVacations) {
+      loadedVacations = defaultVacations;
+    }
+
+    if (loadedVacations && loadedVacations.length > 0) {
+      setVacations(loadedVacations);
+      setEmployees(deriveEmployeesFromVacations(loadedVacations));
+
+      if (showToast) {
+        flashStatus('Datos cargados desde vacations.json');
+      }
+    }
+
+    setIsSyncing(false);
   };
 
   // Initial load on mount
   useEffect(() => {
-    loadVacationsJson(false);
+    loadVacationsData(false);
   }, []);
 
   const flashStatus = (msg: string) => {
     setStatusMessage(msg);
     setTimeout(() => {
       setStatusMessage(null);
-    }, 2500);
+    }, 4000);
   };
 
   const handleExportJson = () => {
@@ -155,10 +168,12 @@ export default function App() {
   };
 
   const handleResetDefaults = () => {
-    setEmployees(INITIAL_EMPLOYEES);
-    setVacations(INITIAL_VACATIONS);
+    const defaultVacations = defaultVacationsData as VacationRequest[];
+    setVacations(defaultVacations);
+    setEmployees(deriveEmployeesFromVacations(defaultVacations));
     localStorage.removeItem(STORAGE_KEY_EMPLOYEES);
     localStorage.removeItem(STORAGE_KEY_VACATIONS);
+    flashStatus('Restablecido a datos de vacations.json');
   };
 
   const handleImportData = (impEmployees: Employee[], impVacations: VacationRequest[]) => {
@@ -178,7 +193,7 @@ export default function App() {
         onOpenAiModal={() => setIsAiModalOpen(true)}
         onOpenEmployeeModal={() => setIsEmployeeModalOpen(true)}
         onOpenSettingsModal={() => setIsSettingsModalOpen(true)}
-        onRefresh={() => loadVacationsJson(true)}
+        onRefresh={() => loadVacationsData(true)}
         onExportJson={handleExportJson}
         statusMessage={statusMessage}
         isSyncing={isSyncing}
