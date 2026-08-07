@@ -25,7 +25,23 @@ jobs:
         with:
           script: |
             const fs = require('fs');
-           
+             function generateColor(text) {
+              let hash = 0;
+            
+              for (let i = 0; i < text.length; i++) {
+                hash = text.charCodeAt(i) + ((hash << 5) - hash);
+              }
+            
+              let color = '#';
+            
+              for (let i = 0; i < 3; i++) {
+                const value = (hash >> (i * 8)) & 255;
+                color += ('00' + value.toString(16)).slice(-2);
+              }
+            
+              return color;
+            }
+            ``
             const body = context.payload.issue.body || '';
             
             const employeeMatch =
@@ -105,20 +121,4 @@ jobs:
               issue_number: context.issue.number,
               state: 'closed'
             });
-            function generateColor(text) {
-              let hash = 0;
-            
-              for (let i = 0; i < text.length; i++) {
-                hash = text.charCodeAt(i) + ((hash << 5) - hash);
-              }
-            
-              let color = '#';
-            
-              for (let i = 0; i < 3; i++) {
-                const value = (hash >> (i * 8)) & 255;
-                color += ('00' + value.toString(16)).slice(-2);
-              }
-            
-              return color;
-            }
-            ``
+           
