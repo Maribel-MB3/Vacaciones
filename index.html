@@ -220,20 +220,21 @@ button:hover {
 <body>
 
 <div class="header">
-  <h1>馃尨 Vacaciones del equipo</h1>
+  <h1>🌴 Vacaciones del equipo</h1>
 
   <div class="controls">
     <button id="prevMonth">&lt;</button>
     <span id="monthLabel"></span>
     <button id="nextMonth">&gt;</button>
     <button id="addBtn" class="btn-primary">+ Nueva solicitud</button>
-    <button id="settingsBtn" title="Configurar repositorio de GitHub">鈿欙笍</button>
+    <button id="refreshBtn" title="Recargar datos de vacations.json">🔄</button>
+    <button id="settingsBtn" title="Configurar repositorio de GitHub">⚙️</button>
   </div>
 </div>
 
 <div id="calendar"></div>
 
-<!-- Modal: a帽adir vacaciones -->
+<!-- Modal: añadir vacaciones -->
 <div class="overlay" id="addOverlay">
   <div class="modal">
     <h2>Nueva solicitud de vacaciones</h2>
@@ -262,19 +263,19 @@ button:hover {
   </div>
 </div>
 
-<!-- Modal: configuraci贸n del repositorio -->
+<!-- Modal: configuración del repositorio -->
 <div class="overlay" id="settingsOverlay">
   <div class="modal">
-    <h2>Configuraci贸n de GitHub</h2>
+    <h2>Configuración de GitHub</h2>
     <div class="hint">
-      Para que lo que a帽adas aqu铆 se guarde de verdad en <code>vacations.json</code>
+      Para que lo que añadas aquí se guarde de verdad en <code>vacations.json</code>
       del repositorio, indica el repo y un token de acceso personal con permiso
       "Contents: Read and write". El token solo se guarda en tu navegador
       (localStorage), nunca se sube al repositorio.
     </div>
 
     <div class="field">
-      <label>Propietario (owner/organizaci贸n)</label>
+      <label>Propietario (owner/organización)</label>
       <input type="text" id="cfgOwner" placeholder="p. ej. mi-usuario">
     </div>
 
@@ -297,7 +298,7 @@ button:hover {
 
     <div class="modal-actions">
       <button id="settingsCancel">Cancelar</button>
-      <button id="settingsSave" class="btn-primary">Guardar configuraci贸n</button>
+      <button id="settingsSave" class="btn-primary">Guardar configuración</button>
     </div>
   </div>
 </div>
@@ -315,7 +316,7 @@ const MONTHS = [
 
 const CONFIG_KEY = "vacaciones_github_config";
 
-/* ---------- Configuraci贸n de GitHub (guardada en localStorage) ---------- */
+/* ---------- Configuración de GitHub (guardada en localStorage) ---------- */
 
 function getConfig() {
   try {
@@ -340,12 +341,54 @@ function fillSettingsForm() {
 
 /* ---------- Carga inicial de datos ---------- */
 
-async function loadData() {
+async function loadData(showStatus) {
 
-  const response = await fetch("./vacations.json?_=" + Date.now());
-  vacations = await response.json();
+  try {
+    // "?_=" evita que el navegador reutilice una copia en caché de la
+    // petición, y "cache: no-store" evita cachés intermedias (CDN, etc.)
+    const response = await fetch("./vacations.json?_=" + Date.now(), {
+      cache: "no-store",
+      headers: { "Cache-Control": "no-cache" }
+    });
 
-  render();
+    if (!response.ok) {
+      throw new Error("No se pudo cargar vacations.json");
+    }
+
+    const data = await response.json();
+
+    // Solo volvemos a pintar si los datos han cambiado, para evitar
+    // parpadeos innecesarios en cada recarga automática.
+    const changed = JSON.stringify(data) !== JSON.stringify(vacations);
+
+    vacations = data;
+
+    if (changed || showStatus) {
+      render();
+    }
+
+    if (showStatus) {
+      flashRefreshStatus("Actualizado " + new Date().toLocaleTimeString());
+    }
+
+  } catch (err) {
+    if (showStatus) {
+      flashRefreshStatus("Error al actualizar", true);
+    }
+  }
+}
+
+function flashRefreshStatus(text, isError) {
+  const label = document.getElementById("monthLabel");
+  const original = MONTHS[current.getMonth()] + " " + current.getFullYear();
+
+  label.textContent = text;
+  label.style.color = isError ? "#f85149" : "#3fb950";
+
+  setTimeout(() => {
+    label.textContent = original;
+    label.style.color = "";
+  }, 1500);
 }
 
 function daysInMonth(year, month) {
@@ -470,6 +513,22 @@ document.getElementById("nextMonth").onclick = () => {
   render();
 };
 
+document.getElementById("refreshBtn").onclick = () => {
+  loadData(true);
+};
+
+/* Recarga automática: cada 30s, y también cuando el usuario vuelve
+   a esta pestaña (por si el workflow de GitHub añadió algo mientras
+   tanto). Así no hace falta darle a F5 a mano. */
+
+setInterval(() => loadData(false), 30000);
+
+document.addEventListener("visibilitychange", () => {
+  if (document.visibilityState === "visible") {
+    loadData(false);
+  }
+});
+
 /* ---------- Modal: nueva solicitud ---------- */
 
 const addOverlay = document.getElementById("addOverlay");
@@ -529,7 +588,7 @@ document.getElementById("addSave").onclick = async () => {
   }
 };
 
-/* ---------- Modal: configuraci贸n ---------- */
+/* ---------- Modal: configuración ---------- */
 
 const settingsOverlay = document.getElementById("settingsOverlay");
 const settingsStatus = document.getElementById("settingsStatus");
@@ -555,13 +614,13 @@ document.getElementById("settingsSave").onclick = () => {
 
   setConfig(cfg);
 
-  settingsStatus.textContent = "Configuraci贸n guardada en este navegador.";
+  settingsStatus.textContent = "Configuración guardada en este navegador.";
   settingsStatus.className = "status ok";
 
   setTimeout(() => settingsOverlay.classList.remove("open"), 700);
 };
 
-/* ---------- Guardado real en vacations.json v铆a API de GitHub ---------- */
+/* ---------- Guardado real en vacations.json vía API de GitHub ---------- */
 
 async function saveToGitHub(newVacations) {
 
@@ -569,7 +628,7 @@ async function saveToGitHub(newVacations) {
 
   if (!cfg.owner || !cfg.repo || !cfg.token) {
     throw new Error(
-      "Configura primero el repositorio y el token en 鈿欙笍 Configuraci贸n."
+      "Configura primero el repositorio y el token en ⚙️ Configuración."
     );
   }
 
@@ -605,7 +664,7 @@ async function saveToGitHub(newVacations) {
       "Accept": "application/vnd.github+json"
     },
     body: JSON.stringify({
-      message: `A帽adir vacaciones de ${newVacations[newVacations.length - 1].employee}`,
+      message: `Añadir vacaciones de ${newVacations[newVacations.length - 1].employee}`,
       content: encoded,
       sha: sha,
       branch: cfg.branch
