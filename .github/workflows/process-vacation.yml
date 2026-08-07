@@ -34,9 +34,7 @@ jobs:
             const departmentMatch =
                     body.match(/### Departamento\s+([\s\S]*?)\s+### Color avatar/);
              const department = departmentMatch ? departmentMatch[1].trim() : '';
-             const avatarColorMatch =
-                    body.match(/### Color avatar\s+([\s\S]*?)\s+### Fecha inicio/);
-             const avatarColor = avatarColorMatch ? avatarColorMatch[1].trim() : '#5A5A40';
+            const avatarColor = generateColor(employee);
              const startMatch =
                     body.match(/### Fecha inicio\s+([\s\S]*?)\s+### Fecha fin/);
              const start = startMatch ? startMatch[1].trim() : '';
@@ -109,3 +107,20 @@ jobs:
               issue_number: context.issue.number,
               state: 'closed'
             });
+            function generateColor(text) {
+              let hash = 0;
+            
+              for (let i = 0; i < text.length; i++) {
+                hash = text.charCodeAt(i) + ((hash << 5) - hash);
+              }
+            
+              let color = '#';
+            
+              for (let i = 0; i < 3; i++) {
+                const value = (hash >> (i * 8)) & 255;
+                color += ('00' + value.toString(16)).slice(-2);
+              }
+            
+              return color;
+            }
+            ``
