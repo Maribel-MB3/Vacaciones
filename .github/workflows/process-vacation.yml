@@ -27,22 +27,31 @@ jobs:
             const fs = require('fs');
 
             const body = context.payload.issue.body || '';
-
-            const employee =
-              body.match(/### Empleado\s+([\s\S]*?)\s+### Departamento/)?.[1]*.trim();
-            const department =
-               body.match(/### Departamento\s+([\s\S]*?)\s+### Color avatar/)?.[1]?.trim();
-            const avatarColor =
-                    body.match(/### Color avatar\s+([\s\S]*?)\s+### Fecha inicio/)?.[1]?.trim();
-            const start =
-              body.match(/### Fecha inicio\s+([\s\S]*?)\s+### Fecha fin/)?.[1]?.trim();
-
-            const end =
-              body.match(/### Fecha fin\s+([\s\S]*?)\s+### Comentarios/)?.[1]?.trim();
-            const status =
-                body.match(/### Estado\s+([\s\S]*?)\s+### Comentarios/)?.[1]?.trim();
-            const notes =
-                body.match(/### Comentarios\s+([\s\S]*)/)?.[1]?.trim() || '';
+            
+            const employeeMatch =
+                    body.match(/### Empleado\s+([\s\S]*?)\s+### Departamento/);
+            const employee = employeeMatch ? employeeMatch[1].trim() : '';                  
+            const departmentMatch =
+                    body.match(/### Departamento\s+([\s\S]*?)\s+### Color avatar/);
+             const department = departmentMatch ? departmentMatch[1].trim() : '';
+             const avatarColorMatch =
+                    body.match(/### Color avatar\s+([\s\S]*?)\s+### Fecha inicio/);
+             const avatarColor = avatarColorMatch ? avatarColorMatch[1].trim() : '#5A5A40';
+             const startMatch =
+                    body.match(/### Fecha inicio\s+([\s\S]*?)\s+### Fecha fin/);
+             const start = startMatch ? startMatch[1].trim() : '';
+                  
+                  const endMatch =
+                    body.match(/### Fecha fin\s+([\s\S]*?)\s+### Estado/);
+                  const end = endMatch ? endMatch[1].trim() : '';
+                  
+                  const statusMatch =
+                    body.match(/### Estado\s+([\s\S]*?)\s+### Comentarios/);
+                  const status = statusMatch ? statusMatch[1].trim() : 'approved';
+                  
+                  const notesMatch =
+                    body.match(/### Comentarios\s+([\s\S]*)/);
+                  const notes = notesMatch ? notesMatch[1].trim() : '';
             if (!employee || !department || !start || !end) {
               core.setFailed('No se pudieron extraer los datos (empleado, fecha inicio o fecha fin) del cuerpo de la issue.');
               return;
@@ -55,14 +64,15 @@ jobs:
               vacations = raw ? JSON.parse(raw) : [];
             }
 
-            vacations.push({id: vacationId,
+            vacations.push({
+              id: vacationId,
               employee,
               department,
               avatarColor: avatarColor || '#5A5A40',
               start,
               end,
-              type: 'vacation',status: status || 
-              'approved',
+              type: 'vacation',
+              status,
               notes });
 
             fs.writeFileSync(
