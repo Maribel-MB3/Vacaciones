@@ -44,30 +44,50 @@ jobs:
           
             const body = context.payload.issue.body || '';
 
-            console.log('BODY START');
-            console.log(body);
-            console.log('BODY END');
+            function getField(body, name) {
+              const regex = new RegExp(
+                `### ${name}\\s*([\\s\\S]*?)(?=\\n### |$)`,
+                'm'
+              );
             
-            const employeeMatch =
-                    body.match(/### Empleado\s+([\s\S]*?)\s+### Departamento/);
-            const employee = employeeMatch ? employeeMatch[1].trim() : '';                  
+              const match = body.match(regex);
+            
+              return match ? match[1].trim() : '';
+            }
+            
+            const body = context.payload.issue.body || '';
+            
+            const employee = getField(body, 'Empleado');
+            const start = getField(body, 'Fecha inicio');
+            const end = getField(body, 'Fecha fin');
+            const type = getField(body, 'Tipo') || 'vacation';
+            const status = getField(body, 'Estado') || 'approved';
+            const notes = getField(body, 'Comentarios');
+            
             const department = 'Desarrollo';
             const avatarColor = generateColor(employee);
-             const startMatch =
-                    body.match(/### Fecha inicio\s+([\s\S]*?)\s+### Fecha fin/);
-             const start = startMatch ? startMatch[1].trim() : '';
-                  
-                  const endMatch =
-                    body.match(/### Fecha fin\s+([\s\S]*?)\s+### Estado/);
-                  const end = endMatch ? endMatch[1].trim() : '';
-                  
-                  const statusMatch =
-                    body.match(/### Estado\s+([\s\S]*?)\s+### Comentarios/);
-                  const status = statusMatch ? statusMatch[1].trim() : 'approved';
-                  
-                  const notesMatch =
-                    body.match(/### Comentarios\s+([\s\S]*)/);
-                  const notes = notesMatch ? notesMatch[1].trim() : '';
+            
+            console.log({
+              employee,
+              start,
+              end,
+              type,
+              status,
+              notes
+            });
+
+            if (!employee || !start || !end) {
+              core.setFailed(
+                `Datos no encontrados:
+                employee=${employee}
+                start=${start}
+                end=${end}`
+              );
+              return;
+            }
+
+
+            
             if (!employee || !department || !start || !end) {
               core.setFailed('No se pudieron extraer los datos (empleado, fecha inicio o fecha fin) del cuerpo de la issue.');
               return;
@@ -84,10 +104,10 @@ jobs:
               id: vacationId,
               employee,
               department,
-              avatarColor: avatarColor || '#5A5A40',
+              avatarColor,
               start,
               end,
-              type: 'vacation',
+              type,
               status,
               notes });
 
