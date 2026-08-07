@@ -8,7 +8,7 @@ import { AiAnalysisModal } from './components/AiAnalysisModal';
 import { EmployeeManagerModal } from './components/EmployeeManagerModal';
 import { SettingsModal } from './components/SettingsModal';
 
-import defaultVacationsData from './vacations.json';
+import defaultVacationsData from './public/vacations.json';
 import { Employee, VacationRequest, FilterState, ViewMode } from './types';
 import { getPastelForName } from './utils/dateUtils';
 
