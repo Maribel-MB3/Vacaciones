@@ -52,7 +52,7 @@ export default function App() {
   });
 
   // Current View Date & View Mode
-  const [currentDate, setCurrentDate] = useState<Date>(new Date(2025, 5, 1)); // June 2025 default focus
+  const [currentDate, setCurrentDate] = useState<Date>(new Date(2026, 5, 1)); // June 2025 default focus
   const [viewMode, setViewMode] = useState<ViewMode>('3m');
 
   // Status & Syncing indicators
