@@ -147,6 +147,5 @@ export const VACATION_TYPES: { id: string; label: string; color: string; badgeBg
   { id: 'vacation', label: 'Vacaciones', color: 'bg-[#A3B18A]', badgeBg: 'bg-[#A3B18A]/20 text-[#2D4023] border-[#A3B18A]', textHex: '#A3B18A' },
   { id: 'personal', label: 'Asuntos Propios', color: 'bg-[#E9C46A]', badgeBg: 'bg-[#E9C46A]/20 text-[#5E4800] border-[#E9C46A]', textHex: '#E9C46A' },
   { id: 'sick', label: 'Baja Médica', color: 'bg-[#E76F51]', badgeBg: 'bg-[#E76F51]/20 text-[#682312] border-[#E76F51]', textHex: '#E76F51' },
-  { id: 'special', label: 'Permiso Especial / Mudanza', color: 'bg-[#B5838D]', badgeBg: 'bg-[#B5838D]/20 text-[#4E222A] border-[#B5838D]', textHex: '#B5838D' },
-  { id: 'remote', label: 'Teletrabajo', color: 'bg-[#788B97]', badgeBg: 'bg-[#788B97]/20 text-[#222E35] border-[#788B97]', textHex: '#788B97' },
+  { id: 'special', label: 'Permiso Especial / Mudanza', color: 'bg-[#B5838D]', badgeBg: 'bg-[#B5838D]/20 text-[#4E222A] border-[#B5838D]', textHex: '#B5838D' } 
 ];
