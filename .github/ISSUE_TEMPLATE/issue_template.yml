@@ -3,14 +3,7 @@ description: Solicitar vacaciones
 title: "[VACACIONES] "
 
 body:
-  - type: input
-    id: id
-    attributes:
-      label: Identificador
-      placeholder: vac-1
-    validations:
-      required: true
-
+  
   - type: input
     id: employee
     attributes:
