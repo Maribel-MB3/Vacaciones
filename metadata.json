@@ -1,0 +1,6 @@
+{
+  "name": "Calendario de Vacaciones Multi-vista",
+  "description": "Calendario profesional de vacaciones del equipo con vistas de 1 mes, 3 meses, 6 meses y 1 año, gestión de solicitudes, alertas de solapamiento y filtrado por departamento.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
