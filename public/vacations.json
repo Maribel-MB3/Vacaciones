@@ -9,5 +9,16 @@
     "type": "vacation",
     "status": "approved",
     "notes": "Vacaciones de verano"
+  },
+  {
+    "id": "vac-2",
+    "employee": "Maribel Fernández",
+    "department": "Desarrollo",
+    "avatarColor": "#5A5A40",
+    "start": "2026-08-01",
+    "end": "2026-08-15\n\n### Tipo\n\nvacation",
+    "type": "vacation",
+    "status": "approved",
+    "notes": "_No response_"
   }
 ]
