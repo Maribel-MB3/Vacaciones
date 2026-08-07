@@ -91,7 +91,7 @@ export default function App() {
       const resJson = await fetch(`./vacations.json?_=${Date.now()}`, { cache: 'no-store' });
       if (resJson.ok) {
         const json = await resJson.json();
-        if (Array.isArray(json) && json.length > 0) {
+        if (Array.isArray(json)) {
           loadedVacations = json;
         }
       }
@@ -99,19 +99,17 @@ export default function App() {
       console.warn('No se pudo cargar ./vacations.json:', err);
     }
 
-    // Fallback to imported vacations.json
-    if (!loadedVacations) {
+    // Fallback to imported vacations.json if fetch failed
+    if (loadedVacations === null) {
       loadedVacations = defaultVacations;
     }
 
-    if (loadedVacations && loadedVacations.length > 0) {
-      setVacations(loadedVacations);
-      setEmployees(deriveEmployeesFromVacations(loadedVacations));
-
-      if (showToast) {
-        flashStatus('Datos cargados desde vacations.json');
-      }
+    setVacations(loadedVacations);
+    setEmployees(deriveEmployeesFromVacations(loadedVacations));
+    if (showToast) {
+      flashStatus('Datos cargados desde vacations.json');
     }
+
 
     setIsSyncing(false);
   };
