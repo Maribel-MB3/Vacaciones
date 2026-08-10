@@ -1,1 +1,13 @@
-[]
+[
+  {
+    "id": "vac-1",
+    "employee": "Maribel Fernández",
+    "department": "Desarrollo",
+    "avatarColor": "#efd650",
+    "start": "2026-08-01",
+    "end": "2026-08-20",
+    "type": "vacation",
+    "status": "approved",
+    "notes": "Vacaciones verano"
+  }
+]
