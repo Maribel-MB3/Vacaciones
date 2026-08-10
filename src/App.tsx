@@ -104,12 +104,29 @@ export default function App() {
       loadedVacations = defaultVacations;
     }
 
-    setVacations(loadedVacations);
-    setEmployees(deriveEmployeesFromVacations(loadedVacations));
+    const finalVacations = loadedVacations;
+
+    // Only trigger a re-render/localStorage write if something actually changed
+    setVacations((prev) => {
+      const same = JSON.stringify(prev) === JSON.stringify(finalVacations);
+      return same ? prev : finalVacations;
+    });
+
+    // Merge: employees derived from the file win, but keep any employee that
+    // was added manually (via the Employee modal) and has no vacation entry yet,
+    // so they don't get wiped out on every automatic sync.
+    setEmployees((prevEmployees) => {
+      const derived = deriveEmployeesFromVacations(finalVacations);
+      const derivedNames = new Set(derived.map((e) => e.name));
+      const manuallyAdded = prevEmployees.filter((e) => !derivedNames.has(e.name));
+      const merged = [...derived, ...manuallyAdded];
+      const same = JSON.stringify(prevEmployees) === JSON.stringify(merged);
+      return same ? prevEmployees : merged;
+    });
+
     if (showToast) {
       flashStatus('Datos cargados desde vacations.json');
     }
-
 
     setIsSyncing(false);
   };
@@ -117,6 +134,32 @@ export default function App() {
   // Initial load on mount
   useEffect(() => {
     loadVacationsData(false);
+  }, []);
+
+  // Auto-sync: poll public/vacations.json periodically so manual edits to the
+  // file show up in the app without needing a manual refresh.
+  useEffect(() => {
+    const POLL_INTERVAL_MS = 5000;
+    const interval = setInterval(() => {
+      loadVacationsData(false);
+    }, POLL_INTERVAL_MS);
+    return () => clearInterval(interval);
+  }, []);
+
+  // Also refresh immediately whenever the tab regains focus/visibility,
+  // so switching back to the app feels instant rather than waiting for the poll.
+  useEffect(() => {
+    const handleVisibility = () => {
+      if (document.visibilityState === 'visible') {
+        loadVacationsData(false);
+      }
+    };
+    document.addEventListener('visibilitychange', handleVisibility);
+    window.addEventListener('focus', handleVisibility);
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibility);
+      window.removeEventListener('focus', handleVisibility);
+    };
   }, []);
 
   const flashStatus = (msg: string) => {
@@ -253,4 +296,3 @@ export default function App() {
     </div>
   );
 }
-
