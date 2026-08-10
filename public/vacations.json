@@ -1,13 +1,1 @@
-[
-  {
-    "id": "vac-1",
-    "employee": "asdf",
-    "department": "Desarrollo",
-    "avatarColor": "#34d42d",
-    "start": "2026-08-01",
-    "end": "2026-08-15",
-    "type": "vacation",
-    "status": "approved",
-    "notes": "_No response_"
-  }
-]
+[]
