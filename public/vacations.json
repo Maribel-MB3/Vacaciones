@@ -31,5 +31,16 @@
     "type": "vacation",
     "status": "approved",
     "notes": "Vacaciones de verano"
+  },
+  {
+    "id": "vac-4",
+    "employee": "Jorge Sanzhez",
+    "department": "Desarrollo",
+    "avatarColor": "#4e86e2",
+    "start": "2026-09-15",
+    "end": "2026-09-17",
+    "type": "vacation",
+    "status": "approved",
+    "notes": "_No response_"
   }
 ]
