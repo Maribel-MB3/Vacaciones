@@ -20,5 +20,16 @@
     "type": "vacation",
     "status": "approved",
     "notes": "_No response_"
+  },
+  {
+    "id": "vac-3",
+    "employee": "Jesús Manzano",
+    "department": "Desarrollo",
+    "avatarColor": "#734d5b",
+    "start": "2026-08-04",
+    "end": "2026-08-14",
+    "type": "vacation",
+    "status": "approved",
+    "notes": "Vacaciones de verano"
   }
 ]
